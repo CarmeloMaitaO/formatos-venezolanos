@@ -1,0 +1,87 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{formatos-institutos-venezolanos}[2022/10/15 Formatos de
+	Institutos Venezolanos]
+\RequirePackage[letterpaper,margin=1in]{geometry}
+\RequirePackage[style=authoryear,sorting=nty]{biblatex}
+\RequirePackage{indentfirst}
+\RequirePackage{array}
+\RequirePackage{multicol}
+\RequirePackage{multirow}
+\RequirePackage{tabularx}
+\RequirePackage{longtable}
+\RequirePackage{makecell}
+\RequirePackage{graphicx}
+\RequirePackage{setspace}
+\RequirePackage{titlesec}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{pgfplots}
+\RequirePackage{tikz}
+\RequirePackage{amsmath}
+\RequirePackage{unicode-math}
+\RequirePackage{lipsum}
+\RequirePackage{hyphenat}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\RequirePackage[main=spanish]{babel}
+
+\setmainfont{TeX Gyre Termes}
+\setmathfont{TeX Gyre Termes Math}
+
+\addto\captionsspanish{% Replace "english" with the language you use
+  \renewcommand{\contentsname}%
+    {ÍNDICE GENERAL}%
+}
+\addto\captionsspanish{% Replace "english" with the language you use
+  \renewcommand{\listtablename}%
+    {LISTA DE CUADROS}%
+}
+\addto\captionsspanish{% Replace "english" with the language you use
+  \renewcommand{\listfigurename}%
+    {LISTA DE FIGURAS}%
+}
+
+\newcolumntype{L}[1]{>{
+        \raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{
+        \centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{
+        \raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+
+\newcommand{\Portada}{
+	\begin{flushleft}
+		\begin{tabular}{C{1.2in}C{5.3in}}
+			\includegraphics[width=1.2in,height=1.2in,keepaspectratio]{\logo} &
+			\begin{center}
+				\instituto
+			\end{center}
+		\end{tabular}
+	\end{flushleft}
+	\vfill
+	\begin{center}
+		{\large{\textbf{\titulo}}}\\
+	\end{center}
+	\vfill
+	\begin{tabular}{L{2.8in}R{2.8in}}
+		\docente &
+		\alumno
+	\end{tabular}
+	\vfill
+	\begin{center}
+		\fecha
+	\end{center}
+	\newpage
+}
+\newcommand{\figura}[2]{
+	\begin{figure}[h]
+		\vskip 2\baselineskip
+		\centering
+		\includegraphics[keepaspectratio, width=\linewidth]{#1}
+		\caption{#2}
+		\vskip 2\baselineskip
+	\end{figure}
+}
+\newenvironment{cita}
+{\begin{spacing}{1}\begin{quotation}}
+{\end{quotation}\end{spacing}}
+
