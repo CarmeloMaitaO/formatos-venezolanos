@@ -1,7 +1,8 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{formatos-institutos-venezolanos}[2022/10/15 Formatos de
 	Institutos Venezolanos]
-\RequirePackage[letterpaper,margin=1in]{geometry}
+\RequirePackage{geometry}
+\RequirePackage[utf8]{inputenc}
 \RequirePackage[style=authoryear,sorting=nty]{biblatex}
 \RequirePackage{indentfirst}
 \RequirePackage{array}
@@ -10,12 +11,10 @@
 \RequirePackage{tabularx}
 \RequirePackage{longtable}
 \RequirePackage{makecell}
-\RequirePackage{graphicx}
+\RequirePackage{graphicx}	% Insertar imágenes/gráficos/vectores
+\RequirePackage{tikz}	% Acomodar las imágenes dentro del texto
 \RequirePackage{setspace}
 \RequirePackage{titlesec}
-\RequirePackage[utf8]{inputenc}
-\RequirePackage{pgfplots}
-\RequirePackage{tikz}
 \RequirePackage{amsmath}
 \RequirePackage{unicode-math}
 \RequirePackage{lipsum}
@@ -23,22 +22,18 @@
 \RequirePackage{caption}
 \RequirePackage{subcaption}
 \RequirePackage[main=spanish]{babel}
+\RequirePackage{import}
+\RequirePackage{arrayjob}	% Arreglos / Vectores / Matrices en LaTeX
+\RequirePackage{multido}	% Ciclos en LaTeX
+\RequirePackage{xcolor}	% Coloreado de textos
+\RequirePackage[normalem]{ulem}	% 
+\RequirePackage{etoolbox}	% Condicionales para las sintaxis
+\RequirePackage{anyfontsize}	% Ajustes del tamaño de fuente
+\RequirePackage{changepage}	% Ajustes del margen de los párrafos
+\RequirePackage{xparse, expl3} % Regex para contar palabras
+\RequirePackage{ragged2e} % Alineación del texto
+\RequirePackage{calc} % Cálculos de espacios
 
-\setmainfont{TeX Gyre Termes}
-\setmathfont{TeX Gyre Termes Math}
-
-\addto\captionsspanish{% Replace "english" with the language you use
-  \renewcommand{\contentsname}%
-    {ÍNDICE GENERAL}%
-}
-\addto\captionsspanish{% Replace "english" with the language you use
-  \renewcommand{\listtablename}%
-    {LISTA DE CUADROS}%
-}
-\addto\captionsspanish{% Replace "english" with the language you use
-  \renewcommand{\listfigurename}%
-    {LISTA DE FIGURAS}%
-}
 
 \newcolumntype{L}[1]{>{
         \raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -46,42 +41,328 @@
         \centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{R}[1]{>{
         \raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+% Forma de nombrar los comandos de
+%% usuario	->	flatcase
+%% contenido1	->	PascalCase
+%% contenido2	->	camelCase
+%% constante	->	UPPERCASE
+
+% Variables universales de los formatos
+%% Variables del formato de página
+\newlength{\CincoEspacios}
+\setlength{\CincoEspacios}{\widthof{~~~~~}}
+
+\newcommand{\Texto}[4]{
+	% Seleccionar fuente principal
+	\setmainfont{#1}
+	% Seleccionar fuente para matemáticas
+	\setmainfont{#2}
+	% Tamaño de la fuente e interlineado
+	\fontsize{#3}{#4}\selectfont
+}
+\newcommand{\negrita}[1]{\textbf{#1}}
+\newcommand{\italica}[1]{\textit{#1}}
+\newcommand{\subrayado}[1]{\underline{#1}}
+\newcommand{\tachado}[1]{\sout{#1}}
+\newcommand{\mayuscula}[1]{\MakeUppercase{#1}}
+\newcommand{\minuscula}[1]{\MakeLowercase{#1}}
+\newcommand{\resaltado}[2]{\colorbox{#1}{#2}}
+\newcommand{\colorTexto}[2]{\textcolor{#1}{#2}}
+
+\newcommand{\alineadoIzquierda}[1]{\RaggedRight{#1}}
+\newenvironment{Izquierda}{\begin{FlushLeft}{}}{\end{FlushLeft}}
+\newcommand{\alineadoDerecha}[1]{\RaggedLeft{#1}}
+\newenvironment{Derecha}{\begin{FlushRight}{}}{\end{FlushRight}}
+\newcommand{\alineadoCentro}[1]{\Centering{#1}}
+\newenvironment{Centro}{\begin{Center}{}}{\end{Center}}
+\newcommand{\alineadoJustificado}[1]{\justifying{#1}}
+\newenvironment{Justificado}{\begin{justify}{}}{\end{justify}}
+
+\newcommand{\Parrafo}[3]{
+	% Sangria
+	\setlength{\parindent}{#1}
+	% Interlineado
+	\setstretch{#2}
+	% Espaciado entre párrafos
+	\setlength{\parskip}{#3}
+}
+\newcommand{\Pagina}[8]{
+	% #1 = Tamaño del papel
+	% #2 = Margen izquierdo
+	% #3 = Margen superior
+	% #4 = Margen derecho
+	% #5 = Margen inferior
+	% #6 = Pie de página
+	% #7 = Encabezado
+	\geometry{
+		#1,
+		left=#2,
+		top=#3,
+		right=#4,
+		bottom=#5,
+		footskip=#6,
+		headheight=#7
+	}
+	\savegeometry{general}
+	\pagestyle{#8}
+	\newcommand{\PaginaGeneral}{\loadgeometry{general}}
+}
+
+\newcommand{\citaL}[2]{
+		\textcite{#1}:
+
+		\begin{adjustwidth}{\CincoEspacios}{\CincoEspacios}
+			\setstretch{1}
+			#2
+		\end{adjustwidth}
+}
+\newcommand{\citaC}[2]{
+		\textcite{#1}, ``#2''
+}
 
 
-\newcommand{\Portada}{
-	\begin{flushleft}
-		\begin{tabular}{C{1.2in}C{5.3in}}
-			\includegraphics[width=1.2in,height=1.2in,keepaspectratio]{\logo} &
-			\begin{center}
-				\instituto
-			\end{center}
+\newcommand{\TRABAJOSESCRITOS}{
+	\Texto{TeX Gyre Termes}{TeX Gyre Termes Math}{12pt}{14pt}
+	\Parrafo{\CincoEspacios}{1.5}{0cm}
+	\Pagina{letterpaper}{4cm}{3cm}{3cm}{3cm}{1.5cm}{0cm}{plain}
+	\titleformat{\chapter}
+	{\normalfont\bfseries\centering\MakeUppercase}
+	{}
+	{0cm}
+	{}
+	\titlespacing{\chapter}
+	{0cm}
+	{2cm}
+	{42pt}
+	\titleformat{\section} % comando
+	{\normalfont\bfseries\centering\MakeUppercase} % formato
+	{} % label
+	{0cm} % separacion desde label
+	{} % comando antes de
+	\titlespacing{\section} % comando
+	{0cm} % separación desde la izquierda
+	{0cm} % separación desde arriba
+	{42pt} % separación hacia abajo
+	\titleformat{\subsection} % comando
+	{\normalfont\bfseries\centering} % formato
+	{} % label
+	{0cm} % separacion desde label
+	{} % comando antes de
+	\titlespacing{\subsection} % comando
+	{0cm} % separación desde la izquierda
+	{0cm} % separación desde arriba
+	{42pt} % separación hacia abajo
+	\titleformat{\subsubsection} % comando
+	{\normalfont\bfseries\itshape\centering} % formato
+	{} % label
+	{0cm} % separacion desde label
+	{} % comando antes de
+	\titlespacing{\subsubsection} % comando
+	{0cm} % separación desde la izquierda
+	{0cm} % separación desde arriba
+	{42pt} % separación hacia abajo
+	\titleformat{\paragraph} % comando
+	{\normalfont\itshape} % formato
+	{} % label
+	{0cm} % separacion desde label
+	{} % comando antes de
+	\titlespacing{\paragraph} % comando
+	{0cm} % separación desde la izquierda
+	{0cm} % separación desde arriba
+	{42pt} % separación hacia abajo
+	\titleformat{\subparagraph} % comando
+	{\normalfont\itshape} % formato
+	{} % label
+	{} % separacion desde label
+	{} % comando antes de
+	\titlespacing{\subparagraph} % comando
+	{0cm} % separación desde la izquierda
+	{0cm} % separación desde arriba
+	{42pt} % separación hacia abajo
+
+	\newcommand{\estudiante}[1]{
+		\newcommand{\Estudiante}{##1}
+	}
+	\newcommand{\estudianteCedula}[1]{
+		\newcommand{\EstudianteCedula}{##1}
+	}
+	\newcommand{\estudianteCarrera}[1]{
+		\newcommand{\EstudianteCarrera}{##1}
+	}
+	\newcommand{\estudianteCodigoCarrera}[1]{
+		\newcommand{\EstudianteCodigoCarrera}{##1}
+	}
+	\newcommand{\profesor}[1]{
+		\newcommand{\Profesor}{##1}
+	}
+	\newcommand{\profesorTitulo}[1]{
+		\newcommand{\ProfesorTitulo}{##1}
+	}
+	\newcommand{\instituto}[1]{
+		\newcommand{\Instituto}{##1}
+	}
+	\newcommand{\extension}[1]{
+		\newcommand{\Extension}{##1}
+	}
+	\newcommand{\logo}[1]{
+		\newcommand{\Logo}{##1}
+	}
+	\newcommand{\mes}[1]{
+		\newcommand{\Mes}{##1}
+	}
+	\newcommand{\ano}[1]{
+		\newcommand{\Ano}{##1}
+	}
+	\newcommand{\asignatura}[1]{
+		\newcommand{\Asignatura}{##1}
+	}
+	\newcommand{\titulo}[1]{
+		\newcommand{\Titulo}{##1}
+	}
+	\newcommand{\ciudad}[1]{
+		\newcommand{\Ciudad}{##1}
+	}
+
+	% Comandos para generar páginas propias del formato
+		
+	\addto\captionsspanish{% Replace "english" with the language you use
+	  \renewcommand{\contentsname}%
+	    {ÍNDICE}%
+	}
+
+	\newcommand{\Portada}{
+		\Parrafo{0em}{1.5}{\baselineskip}
+		\thispagestyle{empty}
+		\begin{Centro}
+		\begin{tikzpicture}[remember picture,overlay]
+		    \node[anchor=north west,yshift=-3cm,xshift=4cm]%
+			at (current page.north west)
+			{\includegraphics[width=2in,keepaspectratio]{\Logo}};
+		\end{tikzpicture}
+		\hspace{5cm}
+		\begin{minipage}{9cm}
+		\alineadoCentro
+		República Bolivariana de Venezuela\\
+		Ministerio del Poder Popular para la Educación\\
+		\Instituto\\
+		Extensión \Extension\\
+		\Asignatura
+		\end{minipage}
+		\vfill
+		{\Large{\negrita{\mayuscula{\Titulo}}}}
+		\vfill
+		\begin{tabular}{L{0.5\textwidth}R{0.5\textwidth}}
+			{\negrita{Docente:}}
+			&
+			{\negrita{Alumno:}}
+			\\
+			{\ProfesorTitulo} {\Profesor}
+			&
+			{\Estudiante}. {\EstudianteCedula}. 
+			\\
+			&
+			{\EstudianteCarrera}.
+			{\EstudianteCodigoCarrera}
 		\end{tabular}
-	\end{flushleft}
-	\vfill
-	\begin{center}
-		{\large{\textbf{\titulo}}}\\
-	\end{center}
-	\vfill
-	\begin{tabular}{L{2.8in}R{2.8in}}
-		\docente &
-		\alumno
-	\end{tabular}
-	\vfill
-	\begin{center}
-		\fecha
-	\end{center}
-	\newpage
+
+		\Ciudad, \Mes, \Ano
+		\end{Centro}
+		\Parrafo{\CincoEspacios}{1.5}{0cm}
+	}
+	\newcommand{\Indice}{
+		\tableofcontents
+	}
+	\newcommand{\Bibliografia}{
+		\printbibliography[title={Bibliografía}]
+	}
 }
-\newcommand{\figura}[2]{
-	\begin{figure}[h]
-		\vskip 2\baselineskip
-		\centering
-		\includegraphics[keepaspectratio, width=\linewidth]{#1}
-		\caption{#2}
-		\vskip 2\baselineskip
-	\end{figure}
+\newcommand{\UTSTEG}{
+	\Texto{TeX Gyre Termes}{TeX Gyre Termes Math}{12pt}{14pt}
+	\Parrafo{\CincoEspacios}{1.5}{0cm}
+	\Pagina{letterpaper}{4cm}{3cm}{3cm}{3cm}{1.5cm}{0cm}{plain}
+		% #1 = Nombre
+		% #2 = Cedula
+		% #3 = Clasificación
+		% #4 = Carrera
+		% #5 = Código carrera
+		% #6 = Título a obtener
+       % Editores
+       	% Clasificación (metodológico / académico)
+       	% Nombre
+       	% Cédula
+       % Organizacion
+       	% Sede
+       	% Clasificación
+
+       	% Institución
+       	% Empresa
+       % Temporal
+       	% Hora
+       	% Dia
+       	% Mes
+       	% Año
+       % Social-Laboral
+       	% Motivo
+       	% Título
+       % Espacial
+       	% País
+       	% Estado
+       	% Ciudad
+       %\portada{
+       %	\begin{tabular}{c}
+       %	\end{tabular}
+       %	\vfill
+       %	\Titulo
+       %	\vfill
+       %	\begin{tabular}{c}
+       %	\end{tabular}
+       %	\vfill
+       %	\ciudad, \fecha
+       %}
+       %\resumen{
+       %	\begin{tabular}{c}
+       %	\end{tabular}
+       %	\vfill
+       %	\Titulo
+       %	\vfill
+       %	\begin{tabular}{c}
+       %	\end{tabular}
+       %	{\textbf{Resumen}}\\
+       %	\RESUMEN
+       %}
 }
-\newenvironment{cita}
-{\begin{spacing}{1}\begin{quotation}}
-{\end{quotation}\end{spacing}}
+
+\DeclareOption{uts-teg}{\UTSTEG}
+\DeclareOption{trabajos-escritos}{\TRABAJOSESCRITOS}
+
+\DeclareOption*{
+	\PackageWarning{formatos-institutos-venezolanos}{
+		Unknown '\CurrentOption'
+	}
+}
+\ProcessOptions\relax
+
+%\addto\captionsspanish{% Replace "english" with the language you use
+%  \renewcommand{\listtablename}%
+%    {LISTA DE CUADROS}%
+%}
+%\addto\captionsspanish{% Replace "english" with the language you use
+%  \renewcommand{\listfigurename}%
+%    {LISTA DE FIGURAS}%
+%}
+%
+%
+%
+%\newcommand{\figura}[2]{
+%	\begin{figure}[h]
+%		\vskip 2\baselineskip
+%		\centering
+%		\includegraphics[keepaspectratio, width=\linewidth]{#1}
+%		\caption{#2}
+%		\vskip 2\baselineskip
+%	\end{figure}
+%}
+%\newenvironment{cita}
+%{\begin{spacing}{1}\begin{quotation}}
+%{\end{quotation}\end{spacing}}
 
