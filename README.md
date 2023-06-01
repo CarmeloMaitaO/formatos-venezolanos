@@ -1,2 +1,2 @@
-# formatos-institutos-educativos-venezolanos
-Paquete de LaTex que agrega comandos para implementar los formatos de documentos usados en las instituciones educativas de Venezuela.
+# Formatos Venezolanos
+Paquetes de LaTeX/LuaTeX/TeX que agregan plantillas para la creación de documentos propios de las instituciones venezolanas.
